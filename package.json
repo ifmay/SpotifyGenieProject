@@ -1,0 +1,20 @@
+{
+    "name": "spotify-authorization-code-pkce",
+    "version": "1.0.0",
+    "description": "Spotify Authorization Code with PKCE flow example",
+    "scripts": {
+        "start": "http-server --cors public"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
+        "body-parser": "^1.20.3",
+        "cors": "^2.8.5",
+        "express": "^4.21.2",
+        "fs": "^0.0.1-security",
+        "http-server": "^14.1.1"
+    },
+    "main": "playlistIntegration.js",
+    "keywords": []
+}

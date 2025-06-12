@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <title>Spotify Genie</title>
+  <style>
+    /* Basic styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #121212;
+      color: #ffffff;
+    }
+   
+    h1, h2, h3, h4 {
+      color: #1DB954; /* Spotify green */
+    }
+   
+    button {
+      background-color: #1DB954;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 30px;
+      cursor: pointer;
+      margin: 5px;
+    }
+   
+    .component-container {
+      background-color: #282828;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+   
+    table {
+      width: 100%;
+    }
+   
+    td {
+      padding: 8px;
+      border-bottom: 1px solid #333;
+    }
+   
+    .track-item {
+      display: flex;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #333;
+      border-radius: 4px;
+    }
+   
+    .track-info {
+      flex: 1;
+    }
+   
+    .track-name {
+      font-weight: bold;
+    }
+   
+    .track-artist {
+      color: #aaa;
+    }
+   
+    .album-cover {
+      width: 50px;
+      height: 50px;
+      border-radius: 4px;
+      margin-left: 10px;
+    }
+   
+    .error-message {
+      color: #ff5555;
+      padding: 10px;
+      background-color: rgba(255, 0, 0, 0.1);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Core containers -->
+  <div id="main" class="component-container"></div>
+ 
+  <!-- New feature containers -->
+  <div id="search-form-container" class="component-container"></div>
+  <div id="tracks-container" class="component-container"></div>
+
+
+  <!-- Templates -->
+  <template id="login">
+    <h1>Spotify Genie</h1>
+    <p>Welcome to Spotify Genie. Connect your Spotify account to get started.</p>
+    <button onclick="loginWithSpotifyClick()">Log in with Spotify</button>
+  </template>
+
+  <template id="search-form-template">
+    <div class="search-container">
+      <h3>Search for Tracks</h3>
+      <form id="search-form" onsubmit="handleSearch(event)">
+        <input type="text" id="search-input" placeholder="Search for tracks or artists..." required>
+        <button type="submit">Search</button>
+      </form>
+      <div id="search-results"></div>
+    </div>
+  </template>
+
+  <template id="search-results-template">
+    <div class="results-container">
+      <h4>Search Results</h4>
+      <div class="track-list">
+        <div data-bind="if searchResults && searchResults.length > 0">
+          <div data-bind="searchResults.map(track => `
+            <div class='track-item'>
+              <div class='track-info'>
+                <div class='track-name'>${track.name}</div>
+                <div class='track-artist'>${track.artist}</div>
+              </div>
+              ${track.albumCover ? `<img src='${track.albumCover}' alt='Album cover' class='album-cover'>` : ''}
+            </div>
+          `).join('')"></div>
+        </div>
+        <div data-bind="if !searchResults || searchResults.length === 0">
+          <p>No results found. Try a different search term.</p>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="playlist-results-template">
+    <div class="playlist-results">
+      <h4 data-bind="'Your ' + (playlistType ? playlistType.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Custom') + ' Playlist'"></h4>
+      <div class="track-list">
+        <div data-bind="if playlistTracks && playlistTracks.length > 0">
+          <div data-bind="playlistTracks.map(track => `
+            <div class='track-item'>
+              <div class='track-info'>
+                <div class='track-name'>${track.name}</div>
+                <div class='track-artist'>${track.artist}</div>
+              </div>
+              ${track.albumCover ? `<img src='${track.albumCover}' alt='Album cover' class='album-cover'>` : ''}
+            </div>
+          `).join('')"></div>
+          
+          <!-- Add Save to Spotify button -->
+          <div class="playlist-actions">
+            <button class="save-spotify-btn" onclick="saveToSpotify()">Save to Spotify</button>
+          </div>
+        </div>
+        <div data-bind="if !playlistTracks || playlistTracks.length === 0">
+          <p> </p>
+        </div>
+      </div>
+    </div>
+  </template>
+
+<!-- Templates to add to index.html -->
+
+<!-- Recommendations Container Template -->
+<template id="csv-recommendations-container-template">
+  <div class="csv-recommendations">
+    <h1>Spotify Genie</h1>
+    <h2>Generate Personalized Recommendations!</h2>
+    <div class="recommendations-actions">
+      <button id="generate-recommendations-btn" onclick="generateCSVRecommendations()" disabled>Generate Recommendations</button>
+      <button onclick="useSpotifyLikedSongs()" class="secondary-button">Refresh Songs Used</button>
+      <button onclick="logoutClick()" class="logout-btn">Log Out</button>
+      <p id="liked-songs-status">No liked songs loaded</p>
+    </div>
+
+    <!-- Updated mood selection UI to add disabled state handling -->
+<div class="mood-selection">
+  <h4>Filter by Mood</h4>
+  <p>Get recommendations that match a specific mood</p>
+  <div class="mood-buttons">
+    <button onclick="generateHappyRecommendations()" class="mood-btn happy-btn" id="happy-mood-btn">
+      <i class="fas fa-smile"></i> Happy
+    </button>
+    <button onclick="generateSadRecommendations()" class="mood-btn sad-btn" id="sad-mood-btn" >
+      <i class="fas fa-sad-tear"></i> Sad
+    </button>
+    <button onclick="generateChillRecommendations()" class="mood-btn chill-btn" id="chill-mood-btn">
+      <i class="fas fa-couch"></i> Chill
+    </button>
+    <button onclick="generateEnergeticRecommendations()" class="mood-btn energetic-btn" id="energetic-mood-btn">
+      <i class="fas fa-bolt"></i> Energetic
+    </button>
+  </div>
+</div>
+
+<!-- Updated CSS for the mood buttons including disabled state -->
+<style>
+  .mood-selection {
+    margin: 15px 0;
+    padding: 15px;
+    background-color: #333;
+    border-radius: 8px;
+  }
+  
+  .mood-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .mood-btn {
+    padding: 10px 15px;
+    border-radius: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+  }
+  
+  .mood-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .happy-btn {
+    background-color: #FFD700; /* Gold */
+    color: #333;
+  }
+  
+  .sad-btn {
+    background-color: #4682B4; /* Steel Blue */
+    color: white;
+  }
+  
+  .chill-btn {
+    background-color: #66CDAA; /* Medium Aquamarine */
+    color: #333;
+  }
+  
+  .energetic-btn {
+    background-color: #FF6347; /* Tomato */
+    color: white;
+  }
+  
+  /* Add animation for loading state */
+  .loading {
+    display: inline-block;
+    position: relative;
+    color: #aaa;
+    font-style: italic;
+  }
+  
+  .loading:after {
+    content: '...';
+    position: absolute;
+    animation: dots 1.5s infinite;
+  }
+  
+  @keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+  }
+  
+  /* Enhanced track-item display for mood recommendations */
+  .track-item .mood-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+  
+  .track-item .mood-score {
+    font-size: 0.8em;
+    color: #aaa;
+    margin-top: 3px;
+  }
+
+  .logout-message {
+  text-align: center;
+  margin: 40px auto;
+  max-width: 500px;
+  padding: 20px;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.spotify-login-btn {
+  background-color: #1DB954;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 30px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.spotify-login-btn:hover {
+  background-color: #1ed760;
+}
+</style>
+
+
+<script>
+// Function to update mood button states
+function updateMoodButtonStates() {
+  // Check if recommendation engine exists and has both dataset and liked songs
+  const dataReady = window.recommendationEngine && 
+                   window.recommendationEngine.dataset && 
+                   window.recommendationEngine.likedSongs;
+  
+  // Find all mood buttons
+  const moodButtons = [
+    document.getElementById('happy-mood-btn'),
+    document.getElementById('sad-mood-btn'),
+    document.getElementById('chill-mood-btn'),
+    document.getElementById('energetic-mood-btn')
+  ];
+  
+  moodButtons.forEach(btn => {
+    if (btn) {
+      btn.disabled = !dataReady;
+      // Add additional class to show they're disabled
+      if (!dataReady) {
+        btn.classList.add('disabled');
+        // Add title attributes to explain why they're disabled
+        if (!window.recommendationEngine || !window.recommendationEngine.dataset) {
+          btn.title = "Waiting for dataset to load...";
+        } else if (!window.recommendationEngine.likedSongs) {
+          btn.title = "Please load your liked songs first";
+        }
+      } else {
+        btn.classList.remove('disabled');
+        btn.title = "";
+      }
+    }
+  });
+  
+  // Also update the generate-recommendations-btn
+  const generateBtn = document.getElementById('generate-recommendations-btn');
+  if (generateBtn) {
+    generateBtn.disabled = !dataReady;
+  }
+}
+
+// Update buttons when data is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Initially set buttons as disabled
+  updateMoodButtonStates();
+  
+  // Update the state when the generate recommendations button gets enabled
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'disabled') {
+        updateMoodButtonStates();
+      }
+    });
+  });
+  
+  const recButton = document.getElementById('generate-recommendations-btn');
+  if (recButton) {
+    observer.observe(recButton, { attributes: true });
+  }
+});
+</script>
+    
+    <div id="csv-recommendations-results"></div>
+  </div>
+</template>
+
+<!-- CSV Recommendations Results Template -->
+<template id="csv-recommendations-template">
+  <div class="recommendations-results">
+    <h4>Your Personalized Recommendations</h4>
+    <div class="track-list">
+      <div data-bind="if recommendations && recommendations.length > 0">
+        <div data-bind="recommendations.map(track => `
+          <div class='track-item'>
+            <div class='track-info'>
+              <div class='track-name'>${track.name}</div>
+              <div class='track-artist'>${track.artist}</div>
+              <div class='track-details'>Genre: ${track.genre} | Match Score: ${track.score}</div>
+            </div>
+            ${track.albumCover ? `<img src='${track.albumCover}' alt='Album cover' class='album-cover'>` : ''}
+          </div>
+        `).join('')"></div>
+        
+        <!-- Add Save to Spotify button -->
+        <div class="playlist-actions">
+          <button class="save-spotify-btn" onclick="saveCSVRecommendationsToSpotify()">Save to Spotify</button>
+        </div>
+      </div>
+      <div data-bind="if !recommendations || recommendations.length === 0">
+        <p>No recommendations generated yet.</p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- CSS Styles for CSV Recommendations -->
+<style>
+  .csv-recommendations {
+    margin-top: 20px;
+  }
+  
+  .upload-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .upload-container {
+    flex: 1;
+    min-width: 300px;
+    background-color: #333;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  
+  .secondary-button {
+    background-color: #666;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 30px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .recommendations-actions {
+    margin: 20px 0;
+  }
+  
+  .loading {
+    color: #aaa;
+    font-style: italic;
+  }
+  
+  .track-details {
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 2px;
+  }
+  
+  .success-message {
+    background-color: rgba(29, 185, 84, 0.2);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
+  
+  .spotify-button {
+    display: inline-block;
+    background-color: #1DB954;
+    color: white;
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 30px;
+    margin-top: 10px;
+  }
+</style>
+
+  <!-- Fix tracks template -->
+<template id="tracks-template-fixed">
+  <div class="saved-tracks">
+    <h3>Your Saved Tracks</h3>
+    <div class="track-list">
+      <div data-bind="tracksDisplay"></div>
+    </div>
+  </div>
+</template>
+
+<!-- Fix results template -->
+<template id="playlist-results-template-fixed">
+  <div class="playlist-results">
+    <h4 data-bind="playlistTitle"></h4>
+    <div class="track-list">
+      <div data-bind="playlistTracksDisplay"></div>
+      
+      <!-- Add Save to Spotify button -->
+      <div class="playlist-actions" data-bind-style="display: playlistTracks && playlistTracks.length > 0 ? 'block' : 'none'">
+        <button class="save-spotify-btn" onclick="saveToSpotify()">Save to Spotify</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- Fix search results template -->
+<template id="search-results-template-fixed">
+  <div class="results-container">
+    <h4>Search Results</h4>
+    <div class="track-list">
+      <div data-bind="searchResultsDisplay"></div>
+    </div>
+  </div>
+</template>
+
+<!-- Fix CSV recommendations template -->
+<template id="csv-recommendations-template-fixed">
+  <div class="recommendations-results">
+    <h4>Your Personalized Recommendations</h4>
+    <div class="track-list">
+      <div data-bind="recommendationsDisplay"></div>
+      
+      <!-- Add Save to Spotify button -->
+      <div class="playlist-actions" data-bind-style="display: recommendations && recommendations.length > 0 ? 'block' : 'none'">
+        <button class="save-spotify-btn" onclick="saveCSVRecommendationsToSpotify()">Save to Spotify</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+// Helper functions to generate HTML for different templates
+function generateTracksDisplay(tracks) {
+  if (!tracks || tracks.length === 0) {
+    return '<p>No saved tracks found.</p>';
+  }
+  
+  return tracks.map(track => `
+    <div class='track-item'>
+      <div class='track-info'>
+        <div class='track-name'>${track.name}</div>
+        <div class='track-artist'>${track.artist}</div>
+      </div>
+      ${track.albumCover ? `<img src='${track.albumCover}' alt='Album cover' class='album-cover'>` : ''}
+    </div>
+  `).join('');
+}
+
+function generatePlaylistTitle(data) {
+  if (!data.playlistType) return 'Your Custom Playlist';
+  return 'Your ' + data.playlistType.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase()) + ' Playlist';
+}
+
+function generatePlaylistTracksDisplay(data) {
+  if (!data.playlistTracks || data.playlistTracks.length === 0) {
+    return '<p>No tracks in this playlist yet.</p>';
+  }
+  
+  return data.playlistTracks.map(track => `
+    <div class='track-item'>
+      <div class='track-info'>
+        <div class='track-name'>${track.name}</div>
+        <div class='track-artist'>${track.artist}</div>
+      </div>
+      ${track.albumCover ? `<img src='${track.albumCover}' alt='Album cover' class='album-cover'>` : ''}
+    </div>
+  `).join('');
+}
+
+function generateSearchResultsDisplay(data) {
+  if (!data.searchResults || data.searchResults.length === 0) {
+    return '<p>No results found. Try a different search term.</p>';
+  }
+  
+  return data.searchResults.map(track => `
+    <div class='track-item'>
+      <div class='track-info'>
+        <div class='track-name'>${track.name}</div>
+        <div class='track-artist'>${track.artist}</div>
+      </div>
+      ${track.albumCover ? `<img src='${track.albumCover}' alt='Album cover' class='album-cover'>` : ''}
+    </div>
+  `).join('');
+}
+
+function generateRecommendationsDisplay(data) {
+  if (!data.recommendations || data.recommendations.length === 0) {
+    return '<p>No recommendations generated yet.</p>';
+  }
+  
+  return data.recommendations.map(track => `
+    <div class='track-item'>
+      <div class='track-info'>
+        <div class='track-name'>${track.name}</div>
+        <div class='track-artist'>${track.artist}</div>
+        <div class='track-details'>Genre: ${track.genre || 'Unknown'} | Match Score: ${track.score}</div>
+      </div>
+      ${track.albumCover ? `<img src='${track.albumCover}' alt='Album cover' class='album-cover'>` : ''}
+    </div>
+  `).join('');
+}
+
+// Updated render functions with pre-processed data
+function renderTracksTemplate(targetId, tracks) {
+  const data = {
+    tracksDisplay: generateTracksDisplay(tracks)
+  };
+  renderTemplate(targetId, "tracks-template-fixed", data);
+}
+
+function renderPlaylistResultsTemplate(targetId, playlistData) {
+  const data = {
+    playlistTitle: generatePlaylistTitle(playlistData),
+    playlistTracksDisplay: generatePlaylistTracksDisplay(playlistData),
+    playlistTracks: playlistData.playlistTracks
+  };
+  renderTemplate(targetId, "playlist-results-template-fixed", data);
+}
+
+function renderSearchResultsTemplate(targetId, searchData) {
+  const data = {
+    searchResultsDisplay: generateSearchResultsDisplay(searchData),
+    searchResults: searchData.searchResults
+  };
+  renderTemplate(targetId, "search-results-template-fixed", data);
+}
+
+function renderRecommendationsTemplate(targetId, recommendationsData) {
+  console.log("Rendering recommendations template with data:", recommendationsData);
+  
+  // Add a direct HTML string for debugging/testing
+  const recommendationsHtml = recommendationsData.recommendations.map(track => `
+    <div class='track-item'>
+      <div class='track-info'>
+        <div class='track-name'>${track.name}</div>
+        <div class='track-artist'>${track.artist}</div>
+        <div class='track-details'>Genre: ${track.genre || 'Unknown'} | Match Score: ${track.score}</div>
+      </div>
+      ${track.albumCover ? `<img src='${track.albumCover}' alt='Album cover' class='album-cover'>` : ''}
+    </div>
+  `).join('');
+  
+  // Create data object with both HTML string and original data
+  const data = {
+    recommendationsDisplay: recommendationsHtml,
+    recommendations: recommendationsData.recommendations
+  };
+  
+  console.log("Final data for template:", data);
+  
+  // Use either fixed template or direct HTML insertion
+  const targetElement = document.getElementById(targetId);
+  if (!targetElement) {
+    console.error(`Target element not found: ${targetId}`);
+    return;
+  }
+  
+  try {
+    // Try using the template
+    renderTemplate(targetId, "csv-recommendations-template-fixed", data);
+  } catch (error) {
+    console.error("Error rendering template:", error);
+    // Fallback to direct HTML
+    targetElement.innerHTML = `
+      <div class="recommendations-results">
+        <h4>Your Personalized Recommendations</h4>
+        <div class="track-list">
+          ${recommendationsHtml}
+          ${recommendationsData.recommendations.length > 0 ? `
+            <div class="playlist-actions">
+              <button class="save-spotify-btn" onclick="saveCSVRecommendationsToSpotify()">Save to Spotify</button>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }
+}
+
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+  <script src="recommendation-engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,751 @@
+/* Basic page styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #121212;
+    color: #ffffff;
+    line-height: 1.6;
+  }
+  
+  h1, h2, h3, h4 {
+    color: #1DB954; /* Spotify green */
+    margin-top: 0;
+  }
+  
+  a {
+    color: #1DB954;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  button {
+    background-color: #1DB954;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 5px;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #1ed760;
+  }
+  
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+  }
+  
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+  }
+  
+  /* Container styling */
+  #main, #oauth, #search-form-container, #playlist-generator-container, #tracks-container {
+    background-color: #282828;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Search and playlist styling */
+  .search-container,
+  .playlist-generator,
+  .saved-tracks,
+  .results-container,
+  .playlist-results {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #333333;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Form styling */
+  form {
+    margin: 15px 0;
+  }
+  
+  input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #404040;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  
+  input[type="text"]::placeholder {
+    color: #aaa;
+  }
+  
+  /* Track list styling */
+  .track-list {
+    margin-top: 15px;
+  }
+  
+  .track-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #404040;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+  }
+  
+  .track-item:hover {
+    background-color: #505050;
+  }
+  
+  .track-info {
+    flex: 1;
+  }
+  
+  .track-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .track-artist {
+    color: #aaa;
+    font-size: 14px;
+  }
+  
+  .album-cover {
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    margin-left: 10px;
+    object-fit: cover;
+  }
+  
+  /* Playlist type radio buttons */
+  .playlist-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .playlist-type {
+    flex: 1 1 160px;
+    padding: 10px;
+    background-color: #404040;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+  }
+  
+  .playlist-type:hover {
+    background-color: #505050;
+  }
+  
+  .playlist-type input[type="radio"] {
+    margin-right: 8px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .playlist-type {
+      flex: 1 1 100%;
+    }
+    
+    .track-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .album-cover {
+      margin-left: 0;
+      margin-top: 10px;
+      width: 100%;
+      height: auto;
+      max-width: 120px;
+    }
+
+    .save-spotify-btn {
+      background-color: #1DB954;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: background-color 0.3s;
+    }
+    
+    .save-spotify-btn:hover {
+      background-color: #1ed760;
+    }
+    
+    .save-spotify-btn:disabled {
+      background-color: #b3b3b3;
+      cursor: not-allowed;
+    }
+    
+    .success-message {
+      background-color: rgba(29, 185, 84, 0.15);
+      color: #1DB954;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+    
+    .success-message a {
+      display: inline-block;
+      margin-top: 10px;
+      background-color: #1DB954;
+      color: white;
+      text-decoration: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+    
+    .success-message a:hover {
+      background-color: #1ed760;
+    }
+    
+    .error-message {
+      background-color: rgba(255, 0, 0, 0.1);
+      color: #ff5555;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+.spotify-button {
+  display: inline-block;
+  background-color: #1DB954;
+  color: white;
+  font-weight: bold;
+  padding: 12px 24px;
+  border-radius: 50px;
+  text-decoration: none;
+  margin-top: 15px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid transparent;
+}
+
+.spotify-button:hover {
+  background-color: #1ed760;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(29, 185, 84, 0.4);
+}
+
+.spotify-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(29, 185, 84, 0.3);
+}
+
+.spotify-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transition: all 0.6s ease;
+}
+
+.spotify-button:hover::before {
+  left: 100%;
+}
+
+.spotify-button i {
+  margin-right: 8px;
+}
+
+.playlist-options {
+  margin-bottom: 20px;
+}
+
+.playlist-category {
+  margin-bottom: 15px;
+}
+
+.playlist-category h5 {
+  margin-bottom: 8px;
+  color: #1DB954;
+  font-size: 1.1em;
+}
+
+.playlist-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.playlist-type {
+  display: flex;
+  align-items: center;
+  background-color: #333;
+  padding: 8px 12px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.playlist-type:hover {
+  background-color: #444;
+}
+
+.playlist-type input[type="radio"] {
+  margin-right: 6px;
+}
+
+.success-message {
+  color: #1DB954;
+  padding: 15px;
+  background-color: rgba(29, 185, 84, 0.1);
+  border-radius: 4px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.spotify-button {
+  display: inline-block;
+  background-color: #1DB954;
+  color: white;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 30px;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/* Loading overlay styles */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.loading-overlay.fade-out {
+  opacity: 0;
+}
+
+.loading-content {
+  text-align: center;
+  color: white;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #1DB954;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Loading overlay styles */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.loading-overlay.fade-out {
+  opacity: 0;
+}
+
+.loading-content {
+  text-align: center;
+  color: white;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #1DB954;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+#loading-message {
+  font-size: 18px;
+  font-weight: 300;
+  margin: 10px 0;
+}
+
+.recommendation-notice {
+  background-color: rgba(255, 193, 7, 0.1);
+  border-left: 4px solid #ffc107;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.track-name {
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 3px;
+}
+
+.track-artist {
+  color: #aaa;
+  margin-bottom: 5px;
+}
+
+.track-genre, .track-score, .mood-category {
+  font-size: 0.85em;
+  color: #888;
+  margin-top: 2px;
+}
+
+.mood-category {
+  color: #1DB954;
+}
+
+/* Styles for loading indicators in search results */
+#search-results .loading-message,
+#playlist-results .loading-message,
+#csv-recommendations-results .loading-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 30px 20px;
+  font-size: 16px;
+  color: #1DB954;
+  width: 100%;
+  min-height: 120px;
+  background-color: rgba(29, 185, 84, 0.05);
+  border-radius: 8px;
+  margin: 15px 0;
+}
+
+/* Loading animation for component loading messages */
+#search-results .loading-message::before,
+#playlist-results .loading-message::before,
+#csv-recommendations-results .loading-message::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(29, 185, 84, 0.2);
+  border-radius: 50%;
+  border-top-color: #1DB954;
+  animation: spin 1s linear infinite;
+  margin-right: 12px;
+}
+
+/* Center text in error messages too */
+.error-message {
+  text-align: center;
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  background-color: rgba(255, 99, 71, 0.1);
+  border-radius: 6px;
+  color: #ff6347;
+  border-left: 4px solid #ff6347;
+}
+
+/* Center text in info messages */
+.info-message {
+  text-align: center;
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  background-color: rgba(100, 149, 237, 0.1);
+  border-radius: 6px;
+  color: #6495ed;
+  border-left: 4px solid #6495ed;
+}
+
+/* Ensure success messages are also centered */
+.success-message {
+  text-align: center;
+  width: 100%;
+  padding: 15px;
+  margin: 15px 0;
+  background-color: rgba(29, 185, 84, 0.1);
+  border-radius: 6px;
+  color: #1DB954;
+  border-left: 4px solid #1DB954;
+}
+
+/* Center the Spotify button in success messages */
+.success-message a.spotify-button {
+  display: block;
+  width: fit-content;
+  margin: 15px auto 5px;
+  padding: 8px 16px;
+  background-color: #1DB954;
+  color: white;
+  text-decoration: none;
+  border-radius: 20px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.success-message a.spotify-button:hover {
+  background-color: #1ed760;
+}
+
+/* Loading message styles */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.loading-content {
+  text-align: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #1DB954;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 20px;
+}
+
+#loading-message {
+  font-size: 20px;
+  font-weight: 400;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 15px 0;
+  padding: 10px;
+  max-width: 80%;
+  margin: 0 auto;
+  text-align: center;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.message-fade-out {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.message-fade-in {
+  animation: messageAppear 0.5s ease forwards;
+}
+
+@keyframes messageAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Add a decorative element below the text */
+#loading-message::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, #1DB954, #1ED760);
+  margin: 15px auto 0;
+  border-radius: 3px;
+}
+
+/* Style for dots that appear after the message */
+.loading-dots {
+  display: inline-block;
+  position: relative;
+  width: 30px;
+  text-align: left;
+}
+
+.loading-dots::after {
+  content: '...';
+  position: absolute;
+  left: 0;
+  animation: loadingDots 1.5s infinite;
+  letter-spacing: 2px;
+}
+
+@keyframes loadingDots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
+/* Center regular loading messages in the app */
+.loading-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+  color: #1DB954;
+  width: 100%;
+}
+
+.loading-message::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(29, 185, 84, 0.3);
+  border-radius: 50%;
+  border-top-color: #1DB954;
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
+}
+
+/* For centered loading state within components */
+p.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+  color: #1DB954;
+  width: 100%;
+}
+
+p.loading::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(29, 185, 84, 0.3);
+  border-radius: 50%;
+  border-top-color: #1DB954;
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
+}
+
+/* Preloaded dataset styles */
+#dataset-status.preloaded {
+  color: #1DB954;
+  font-weight: bold;
+}
+
+.dataset-preloaded-note {
+  font-size: 0.9em;
+  color: #999;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+.dataset-actions {
+  margin-top: 10px;
+}
+
+/* Track display styles */
+.track-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #333;
+}
+
+.track-info {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.track-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.track-artist {
+  color: #666;
+}
+
+.album-cover {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.track-list {
+  margin-bottom: 20px;
+}
+
+}
